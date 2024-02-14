@@ -4,8 +4,24 @@ interface PageProps {
   }
 }
 
-export default function PageProps({ params }: PageProps) {
+export default async function PageProps({
+  params,
+}: PageProps) {
   const { processId } = params
 
-  return <h1>{processId}</h1>
+  const res = await fetch(
+    'https://platform.senior.com.br/t/senior.com.br/bridge/1.0/rest/platform/workflow/queries/getInfoFromProcessVariables?processInstanceId=1514',
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization:
+          'bearer WtztNXZUmxDBYFmFgs6hPMRbPkjn5chb',
+      },
+    }
+  )
+
+  const processVariables = await res.json()
+
+  return <p>{JSON.stringify(processVariables)}</p>
 }
