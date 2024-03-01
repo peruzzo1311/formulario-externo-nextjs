@@ -1,13 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   AnexoFile,
   UseProcessVariables,
 } from '@/hooks/use-process-variables'
 
-import responsePendency from '@/app/process-id/[processId]/response-pendency'
 import formatBytes from '@/utils/format-bytes'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
@@ -18,15 +17,19 @@ import { InputTextarea } from 'primereact/inputtextarea'
 export default function FormComponent({
   processVariablesProps,
   processId,
-  token,
 }: any) {
+  const [isLoading, setIsLoading] = useState(false)
   const { processVariables, setProcessVariables } =
     UseProcessVariables()
 
   useEffect(() => {
-    const arquivosTxt = JSON.parse(
-      processVariablesProps.arquivosTxt
-    )
+    let arquivosTxt = ''
+
+    if (processVariablesProps.arquivosTxt) {
+      arquivosTxt = JSON.parse(
+        processVariablesProps.arquivosTxt
+      )
+    }
 
     setProcessVariables({
       ...processVariablesProps,
@@ -60,7 +63,9 @@ export default function FormComponent({
     link.remove()
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    setIsLoading(true)
+
     const processInfos = {
       activityId: '4',
       processInstanceID: processId,
@@ -68,7 +73,9 @@ export default function FormComponent({
     }
 
     const responseData = {
-      businessData: JSON.stringify(processVariables),
+      businessData: JSON.stringify({
+        response: processVariables,
+      }),
       flowExecutionData: {
         actionToExecute: 'Prosseguir',
         nextSubject: null,
@@ -76,7 +83,18 @@ export default function FormComponent({
       },
     }
 
-    responsePendency(token, processInfos, responseData)
+    await fetch('/api/response-pendency', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        processInfos,
+        responseData,
+      }),
+    })
+
+    setIsLoading(false)
   }
 
   return (
@@ -152,7 +170,12 @@ export default function FormComponent({
       </div>
 
       <div className="w-full mt-4 flex justify-center">
-        <Button onClick={nextStep}>Enviar</Button>
+        <Button
+          loading={isLoading}
+          onClick={nextStep}
+          label={isLoading ? 'Enviando...' : 'Enviar'}
+          icon="pi pi-send"
+        />
       </div>
     </main>
   )

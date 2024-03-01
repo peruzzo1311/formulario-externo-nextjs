@@ -39,7 +39,6 @@ export default async function PageProps({
       <FormComponent
         processVariablesProps={processVariables}
         processId={processId}
-        token={token}
       />
     </Card>
   )
