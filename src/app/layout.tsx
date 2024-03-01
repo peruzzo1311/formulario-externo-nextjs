@@ -17,7 +17,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({
   children,
-}: Readonly<RootLayoutProps>) {
+}: RootLayoutProps) {
   return (
     <html lang="pt-BR">
       <body className={inter.className}>

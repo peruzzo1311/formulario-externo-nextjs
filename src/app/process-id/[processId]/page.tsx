@@ -1,3 +1,8 @@
+import FormComponent from '@/components/form'
+import { Card } from 'primereact/card'
+import getProcessVariables from './get-process-variables'
+import getToken from './get-token'
+
 interface PageProps {
   params: {
     processId: string
@@ -8,20 +13,34 @@ export default async function PageProps({
   params,
 }: PageProps) {
   const { processId } = params
+  const processVariables = {} as any
 
-  const res = await fetch(
-    'https://platform.senior.com.br/t/senior.com.br/bridge/1.0/rest/platform/workflow/queries/getInfoFromProcessVariables?processInstanceId=1514',
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'bearer WtztNXZUmxDBYFmFgs6hPMRbPkjn5chb',
-      },
+  const token = await getToken()
+
+  const GetProcessVariables = await getProcessVariables(
+    processId,
+    token
+  )
+
+  if (!GetProcessVariables) {
+    return <h1>Id de processo não encontrado!</h1>
+  }
+
+  GetProcessVariables.contents.forEach(
+    (processVariable) => {
+      const { key, value } = processVariable
+
+      processVariables[key] = value ?? ''
     }
   )
 
-  const processVariables = await res.json()
-
-  return <p>{JSON.stringify(processVariables)}</p>
+  return (
+    <Card className="m-4">
+      <FormComponent
+        processVariablesProps={processVariables}
+        processId={processId}
+        token={token}
+      />
+    </Card>
+  )
 }
