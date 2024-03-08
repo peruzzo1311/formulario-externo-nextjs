@@ -74,7 +74,12 @@ export default function FormComponent({
 
     const responseData = {
       businessData: JSON.stringify({
-        response: processVariables,
+        response: {
+          ...processVariables,
+          arquivosTxt: JSON.stringify(
+            processVariables.arquivosTxt
+          ),
+        },
       }),
       flowExecutionData: {
         actionToExecute: 'Prosseguir',

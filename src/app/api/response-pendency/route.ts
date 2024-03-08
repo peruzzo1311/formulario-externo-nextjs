@@ -27,8 +27,6 @@ export async function POST(req: Request) {
       },
     }
 
-    console.log(JSON.stringify(body, null, 2))
-
     const res = await fetch(
       'https://platform.senior.com.br/t/senior.com.br/bridge/1.0/rest/platform/workflow/actions/responsePendency',
       {
